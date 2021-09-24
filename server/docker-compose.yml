@@ -1,0 +1,33 @@
+version: "3.9"
+
+services: 
+    web:
+        container_name: test-desafioapp
+        restart: always
+        build: .
+        ports:
+            - "4000:4000"
+        links: 
+            - mongo
+        volumes: 
+            - .:/usr/src/app    
+    database:
+        container_name: test-desafiomongodb
+        hostname: mongodb-host
+        image: mongo
+        environment: 
+            MONGO_INITDB_ROOT_USERNAME: brandDiscountsUser
+            MONGO_INITDB_ROOT_PASSWORD: brandDiscountsPassword
+        volumes: 
+            - ./database:/database            
+        ports:
+            - "27017:27017"
+    migration:
+          image: mongo
+          container_name: test-migration-data
+          volumes: 
+            - ./database:/database    
+          depends_on:
+            - database
+          restart: "no"
+          command: ./database/import.sh mongodb-host         
